@@ -6,7 +6,7 @@ steps:
     - 'k8s/'
   env:
     - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'   # change to your GKE cluster zone
-    - 'CLOUDSDK_CONTAINER_CLUSTER=my-gke-cluster' # change to your cluster name
+    - 'CLOUDSDK_CONTAINER_CLUSTER=gke-documenso-twenty-cluster' # change to your cluster name
 
 options:
   logging: CLOUD_LOGGING_ONLY
