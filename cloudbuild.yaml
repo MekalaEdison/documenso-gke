@@ -1,0 +1,43 @@
+options:
+  substitutionOption: ALLOW_LOOSE
+
+substitutions:
+  _PROJECT_ID: "natural-apricot-470812-u9"
+  _LOCATION: "us-central1"
+  _REPOSITORY: "apps-repo"
+  _CLUSTER: "gke-documenso-twenty-cluster"
+  _CLUSTER_LOCATION: "us-central1-a"
+
+steps:
+# 1. Install & test (if needed)
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['ci']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['test']
+
+# 2. Build Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/documenso:$SHORT_SHA'
+    - '.'
+
+# 3. Push Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/documenso:$SHORT_SHA'
+
+# 4. Deploy to GKE
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  args:
+    - 'run'
+    - '--filename=k8s/deployment.yaml'
+    - '--image=${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/documenso:$SHORT_SHA'
+    - '--cluster=${_CLUSTER}'
+    - '--location=${_CLUSTER_LOCATION}'
+
+images:
+  - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/documenso:latest'
+
